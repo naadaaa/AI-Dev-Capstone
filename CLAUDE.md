@@ -148,3 +148,11 @@ Never hardcode keys. Never commit `.env`.
 3. Reuse existing abstractions; do not duplicate API or AI client logic.
 4. After adding tooling, update the Commands table and `.env.example`.
 5. Do not create git commits unless explicitly asked.
+
+## Project Rules (learned from FE-02 prompting drill)
+
+1. **Never let scope be inferred from repo context alone — state the exact fields/entities in every feature prompt.** A vague prompt for "a settings form" produced an AI-preferences form (model, temperature, tokens) instead of the actual required fields, because the model inferred scope from the codebase rather than being told. Every prompt for a new component must explicitly list the fields/props/behavior — no prompt should rely on the AI guessing intent from surrounding files.
+
+2. **`aria-describedby` (and any ARIA attribute) must be placed on the actual form control (input/select/textarea), never on a wrapping element.** A wrapper-level `aria-describedby` looks correct in a code review but is silently non-functional for screen readers. Any generated form component must be checked for this specifically — grep for `aria-describedby` and confirm it sits on the same JSX element as the input, not a parent div.
+
+3. **Every AI-generated test suite must be run before being trusted, and any test using a shared/non-unique query (e.g. `getByRole('alert')`, `getByRole('button')` without a name filter) must be scoped tightly enough to survive multiple similar elements rendering at once.** A test suite passed code review but failed on run because `findByRole('alert')` broke when two validation errors rendered simultaneously — the component was correct, the test wasn't. "Write it, then write tests and run them" is not optional; a generated test file that has never been executed is an unverified claim, not a safety net.
